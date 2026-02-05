@@ -2,14 +2,13 @@
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { MessageCircle, X, Send } from 'lucide-react';
-import { ChatMessage, TimeSlot, MeetingType } from '@/lib/types';
+import { ChatMessage, TimeSlot } from '@/lib/types';
 import { useScheduling } from '@/context/SchedulingContext';
 import { mockCandidateInfo, formatDate, formatTime } from '@/lib/mock-data';
 import {
   ChatState,
   initialChatState,
   getGreetingMessage,
-  getMeetingTypeMessage,
   getPhoneCollectionMessage,
   getSuccessMessage,
   getRescheduleMessage,
@@ -18,7 +17,6 @@ import {
 } from '@/lib/chat-flow';
 import { ChatBubble, TypingIndicator } from './ChatBubble';
 import { TimeSlotPicker } from './TimeSlotPicker';
-import { MeetingTypeSelector } from './MeetingTypeSelector';
 import { ConfirmationCard } from './ConfirmationCard';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
@@ -33,6 +31,9 @@ export function ChatWidget() {
 
   const { getAvailableSlots, meetingPreferences, bookSlot } = useScheduling();
   const availableSlots = getAvailableSlots();
+
+  // Meeting type is set by manager, not candidate
+  const meetingType = meetingPreferences.meetingType;
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -59,9 +60,9 @@ export function ChatWidget() {
         mockCandidateInfo.company
       );
       addBotMessage(greeting, 'time_slots');
-      setChatState(prev => ({ ...prev, step: 'show_slots' }));
+      setChatState(prev => ({ ...prev, step: 'show_slots', selectedMeetingType: meetingType }));
     }
-  }, [isOpen, messages.length, addBotMessage]);
+  }, [isOpen, messages.length, addBotMessage, meetingType]);
 
   const handleSlotSelect = (slot: TimeSlot) => {
     setChatState(prev => ({ ...prev, selectedSlot: slot }));
@@ -69,24 +70,13 @@ export function ChatWidget() {
       ...prev,
       createUserMessage(`${formatDate(slot.date)} at ${formatTime(slot.startTime)}`),
     ]);
-    addBotMessage(getMeetingTypeMessage(), 'meeting_type');
-    setChatState(prev => ({ ...prev, step: 'meeting_type' }));
-  };
 
-  const handleMeetingTypeSelect = (type: MeetingType) => {
-    setChatState(prev => ({ ...prev, selectedMeetingType: type }));
-
-    const typeLabels: Record<MeetingType, string> = {
-      'in-person': 'In-Person Meeting',
-      'video': 'Video Call',
-      'phone': 'Phone Call',
-    };
-    setMessages(prev => [...prev, createUserMessage(typeLabels[type])]);
-
-    if (type === 'phone') {
+    // If phone interview, collect phone number first
+    if (meetingType === 'phone') {
       addBotMessage(getPhoneCollectionMessage(), 'phone_input');
       setChatState(prev => ({ ...prev, step: 'collect_phone' }));
     } else {
+      // Otherwise go straight to confirmation
       setChatState(prev => ({ ...prev, step: 'confirm' }));
       addBotMessage('Please confirm your interview details:', 'confirmation');
     }
@@ -126,7 +116,6 @@ export function ChatWidget() {
       ...prev,
       step: 'show_slots',
       selectedSlot: null,
-      selectedMeetingType: null,
       isConfirmed: false,
     }));
     setMessages(prev => [...prev, createUserMessage('I need to reschedule')]);
@@ -134,11 +123,11 @@ export function ChatWidget() {
   };
 
   const getMeetingDetails = () => {
-    if (chatState.selectedMeetingType === 'in-person') {
+    if (meetingType === 'in-person') {
       return { location: meetingPreferences.defaultLocation };
-    } else if (chatState.selectedMeetingType === 'video') {
+    } else if (meetingType === 'video') {
       return { videoLink: meetingPreferences.videoLink };
-    } else if (chatState.selectedMeetingType === 'phone') {
+    } else if (meetingType === 'phone') {
       return { phoneNumber: chatState.phoneNumber || meetingPreferences.phoneNumber };
     }
     return {};
@@ -149,24 +138,12 @@ export function ChatWidget() {
 
     switch (message.component) {
       case 'time_slots':
-        if (chatState.step === 'show_slots' || chatState.step === 'meeting_type') {
+        if (chatState.step === 'show_slots') {
           return (
             <TimeSlotPicker
               slots={availableSlots}
               selectedSlot={chatState.selectedSlot}
               onSelectSlot={handleSlotSelect}
-            />
-          );
-        }
-        return null;
-
-      case 'meeting_type':
-        if (chatState.step === 'meeting_type' || chatState.step === 'collect_phone' || chatState.step === 'confirm') {
-          return (
-            <MeetingTypeSelector
-              allowedTypes={meetingPreferences.allowedTypes}
-              selectedType={chatState.selectedMeetingType}
-              onSelectType={handleMeetingTypeSelect}
             />
           );
         }
@@ -225,9 +202,9 @@ export function ChatWidget() {
         <MessageCircle className="w-6 h-6 text-white" />
       </button>
 
-      {/* Chat Panel */}
+      {/* Chat Panel - Mobile responsive */}
       <div
-        className={`fixed bottom-6 right-6 w-[380px] h-[600px] max-h-[80vh] bg-[#0f1629] border border-white/10 rounded-2xl shadow-2xl flex flex-col overflow-hidden z-50 transition-all duration-300 ${
+        className={`fixed bottom-0 right-0 sm:bottom-6 sm:right-6 w-full sm:w-[380px] h-[100dvh] sm:h-[600px] sm:max-h-[80vh] bg-[#0f1629] border-t sm:border border-white/10 sm:rounded-2xl shadow-2xl flex flex-col overflow-hidden z-50 transition-all duration-300 ${
           isOpen ? 'scale-100 opacity-100' : 'scale-95 opacity-0 pointer-events-none'
         }`}
       >

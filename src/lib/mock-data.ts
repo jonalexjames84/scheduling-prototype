@@ -149,7 +149,7 @@ export const mockInterviews: Interview[] = [
 
 // Mock meeting preferences
 export const mockMeetingPreferences: MeetingPreferences = {
-  allowedTypes: ['in-person', 'video', 'phone'],
+  meetingType: 'in-person',  // Manager sets this
   defaultLocation: '123 Restaurant Ave, Suite 100, New York, NY 10001',
   videoLink: 'https://zoom.us/j/123456789',
   phoneNumber: '(555) 234-5678',

@@ -20,12 +20,8 @@ export const getGreetingMessage = (candidateName: string, jobTitle: string, comp
   return `Hi ${candidateName}! Thanks for applying to the ${jobTitle} position at ${company}. Let's schedule your interview. Please select a time that works for you.`;
 };
 
-export const getMeetingTypeMessage = (): string => {
-  return `Great choice! How would you like to meet?`;
-};
-
 export const getPhoneCollectionMessage = (): string => {
-  return `Perfect! What's the best phone number to reach you at?`;
+  return `Great choice! What's the best phone number to reach you at?`;
 };
 
 export const getConfirmationMessage = (
@@ -62,8 +58,7 @@ export const getNextStep = (currentStep: ChatStep, meetingType?: MeetingType): C
     case 'greeting':
       return 'show_slots';
     case 'show_slots':
-      return 'meeting_type';
-    case 'meeting_type':
+      // Skip to phone collection if phone interview, otherwise go to confirm
       return meetingType === 'phone' ? 'collect_phone' : 'confirm';
     case 'collect_phone':
       return 'confirm';

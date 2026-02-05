@@ -24,7 +24,7 @@ export interface Interview {
 }
 
 export interface MeetingPreferences {
-  allowedTypes: MeetingType[];
+  meetingType: MeetingType;  // Single type set by manager
   defaultLocation: string;
   videoLink: string;
   phoneNumber: string;
@@ -41,7 +41,6 @@ export interface AvailabilityBlock {
 export type ChatStep =
   | 'greeting'
   | 'show_slots'
-  | 'meeting_type'
   | 'collect_phone'
   | 'confirm'
   | 'success'
@@ -52,7 +51,7 @@ export interface ChatMessage {
   type: 'bot' | 'user' | 'system';
   content: string;
   timestamp: Date;
-  component?: 'time_slots' | 'meeting_type' | 'phone_input' | 'confirmation' | 'success';
+  component?: 'time_slots' | 'phone_input' | 'confirmation' | 'success';
 }
 
 export interface CandidateInfo {
