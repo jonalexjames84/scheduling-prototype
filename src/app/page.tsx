@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { MessageCircle, LayoutDashboard, Calendar, ArrowRight, FileText, Code } from 'lucide-react';
+import { MessageCircle, LayoutDashboard, Calendar, ArrowRight, FileText, Code, RefreshCw, AlertTriangle } from 'lucide-react';
 
 export default function Home() {
   return (
@@ -27,6 +27,22 @@ export default function Home() {
             >
               <Code className="w-4 h-4 text-green-400" />
               Technical Requirements (TRD)
+            </Link>
+          </div>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mt-3">
+            <Link
+              href="/shift-swap-prd"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full text-sm text-gray-300 hover:bg-white/10 hover:border-orange-500/50 transition-all"
+            >
+              <RefreshCw className="w-4 h-4 text-orange-400" />
+              Shift Swap PRD
+            </Link>
+            <Link
+              href="/shift-swap-trd"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full text-sm text-gray-300 hover:bg-white/10 hover:border-orange-500/50 transition-all"
+            >
+              <AlertTriangle className="w-4 h-4 text-orange-400" />
+              Shift Swap TRD
             </Link>
           </div>
         </div>
