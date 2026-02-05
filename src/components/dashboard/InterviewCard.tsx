@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Interview, TimeSlot } from '@/lib/types';
+import { Interview, TimeSlot, MeetingType } from '@/lib/types';
 import { formatDate, formatTime } from '@/lib/mock-data';
 import { useScheduling } from '@/context/SchedulingContext';
 import {
@@ -15,7 +15,8 @@ import {
   MoreVertical,
   RefreshCw,
   X,
-  CheckCircle
+  CheckCircle,
+  Settings2
 } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -27,7 +28,8 @@ interface InterviewCardProps {
 export function InterviewCard({ interview }: InterviewCardProps) {
   const [showMenu, setShowMenu] = useState(false);
   const [showReschedule, setShowReschedule] = useState(false);
-  const { updateInterview, cancelInterview, getAvailableSlots } = useScheduling();
+  const [showMeetingTypeModal, setShowMeetingTypeModal] = useState(false);
+  const { updateInterview, cancelInterview, getAvailableSlots, meetingPreferences } = useScheduling();
 
   const statusColors = {
     scheduled: 'bg-blue-500/20 text-blue-300 border-blue-500/30',
@@ -58,7 +60,27 @@ export function InterviewCard({ interview }: InterviewCardProps) {
     setShowMenu(false);
   };
 
+  const handleMeetingTypeChange = (newType: MeetingType) => {
+    // Update meeting type and corresponding meeting details
+    const newDetails = { ...interview.meetingDetails };
+    if (newType === 'in-person') {
+      newDetails.location = meetingPreferences.defaultLocation;
+    } else if (newType === 'video') {
+      newDetails.videoLink = meetingPreferences.videoLink;
+    } else if (newType === 'phone') {
+      newDetails.phoneNumber = meetingPreferences.phoneNumber;
+    }
+    updateInterview(interview.id, { meetingType: newType, meetingDetails: newDetails });
+    setShowMeetingTypeModal(false);
+  };
+
   const availableSlots = getAvailableSlots();
+
+  const meetingTypeLabels = {
+    'in-person': 'In-Person',
+    'video': 'Video Call',
+    'phone': 'Phone Call',
+  };
 
   return (
     <>
@@ -102,6 +124,13 @@ export function InterviewCard({ interview }: InterviewCardProps) {
                   >
                     <RefreshCw className="w-4 h-4" />
                     Reschedule
+                  </button>
+                  <button
+                    onClick={() => { setShowMeetingTypeModal(true); setShowMenu(false); }}
+                    className="w-full px-4 py-2 text-left text-sm text-white hover:bg-white/10 flex items-center gap-2"
+                  >
+                    <Settings2 className="w-4 h-4" />
+                    Change Meeting Type
                   </button>
                   <button
                     onClick={handleCancel}
@@ -170,6 +199,55 @@ export function InterviewCard({ interview }: InterviewCardProps) {
               ))}
             </div>
             <Button variant="secondary" onClick={() => setShowReschedule(false)} className="w-full">
+              Cancel
+            </Button>
+          </Card>
+        </div>
+      )}
+
+      {/* Change Meeting Type Modal */}
+      {showMeetingTypeModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <Card className="w-full max-w-md p-6 m-4">
+            <h3 className="text-lg font-semibold text-white mb-2">Change Meeting Type</h3>
+            <p className="text-sm text-gray-400 mb-4">
+              Select a new meeting format for {interview.candidateName}&apos;s interview.
+            </p>
+            <div className="space-y-3 mb-4">
+              {(['in-person', 'video', 'phone'] as MeetingType[]).map((type) => {
+                const Icon = meetingIcons[type];
+                const isSelected = interview.meetingType === type;
+                return (
+                  <button
+                    key={type}
+                    onClick={() => handleMeetingTypeChange(type)}
+                    className={`w-full p-4 rounded-xl border flex items-center gap-4 transition-all ${
+                      isSelected
+                        ? 'bg-[#007BE5]/20 border-[#007BE5]/50'
+                        : 'bg-white/5 border-white/10 hover:bg-white/10'
+                    }`}
+                  >
+                    <div className={`p-2 rounded-lg ${isSelected ? 'bg-[#007BE5]/30' : 'bg-white/10'}`}>
+                      <Icon className={`w-5 h-5 ${isSelected ? 'text-[#007BE5]' : 'text-gray-400'}`} />
+                    </div>
+                    <div className="text-left flex-1">
+                      <p className={`font-medium ${isSelected ? 'text-white' : 'text-gray-300'}`}>
+                        {meetingTypeLabels[type]}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        {type === 'in-person' && meetingPreferences.defaultLocation}
+                        {type === 'video' && meetingPreferences.videoLink}
+                        {type === 'phone' && meetingPreferences.phoneNumber}
+                      </p>
+                    </div>
+                    {isSelected && (
+                      <CheckCircle className="w-5 h-5 text-[#007BE5]" />
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+            <Button variant="secondary" onClick={() => setShowMeetingTypeModal(false)} className="w-full">
               Cancel
             </Button>
           </Card>

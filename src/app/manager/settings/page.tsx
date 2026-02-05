@@ -78,8 +78,8 @@ export default function SettingsPage() {
       {/* Interview Type */}
       <Card>
         <CardHeader>
-          <h2 className="font-semibold text-white">Interview Type</h2>
-          <p className="text-sm text-gray-400">How will you conduct interviews?</p>
+          <h2 className="font-semibold text-white">Default Interview Type</h2>
+          <p className="text-sm text-gray-400">New interviews will use this format. You can change the type for individual interviews from the Interviews page.</p>
         </CardHeader>
         <CardContent className="space-y-3">
           {[
