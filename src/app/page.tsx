@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { MessageCircle, LayoutDashboard, Calendar, ArrowRight } from 'lucide-react';
+import { MessageCircle, LayoutDashboard, Calendar, ArrowRight, FileText } from 'lucide-react';
 
 export default function Home() {
   return (
@@ -10,9 +10,16 @@ export default function Home() {
           <h1 className="text-4xl font-bold text-white mb-4">
             Scheduling Tool Prototype
           </h1>
-          <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+          <p className="text-gray-400 text-lg max-w-2xl mx-auto mb-6">
             A frontend-only prototype demonstrating interview scheduling with a candidate chat widget and hiring manager dashboard.
           </p>
+          <Link
+            href="/prd"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full text-sm text-gray-300 hover:bg-white/10 hover:border-[#007BE5]/50 transition-all"
+          >
+            <FileText className="w-4 h-4 text-[#007BE5]" />
+            View Product Requirements Document
+          </Link>
         </div>
 
         {/* Demo Cards */}
@@ -41,7 +48,7 @@ export default function Home() {
               </li>
               <li className="flex items-center gap-2">
                 <Calendar className="w-4 h-4 text-[#007BE5]" />
-                Choose meeting type (in-person, video, phone)
+                View meeting type set by manager
               </li>
               <li className="flex items-center gap-2">
                 <Calendar className="w-4 h-4 text-[#007BE5]" />
