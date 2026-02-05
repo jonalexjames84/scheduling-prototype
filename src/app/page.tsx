@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { MessageCircle, LayoutDashboard, Calendar, ArrowRight, FileText } from 'lucide-react';
+import { MessageCircle, LayoutDashboard, Calendar, ArrowRight, FileText, Code } from 'lucide-react';
 
 export default function Home() {
   return (
@@ -13,13 +13,22 @@ export default function Home() {
           <p className="text-gray-400 text-lg max-w-2xl mx-auto mb-6">
             A frontend-only prototype demonstrating interview scheduling with a candidate chat widget and hiring manager dashboard.
           </p>
-          <Link
-            href="/prd"
-            className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full text-sm text-gray-300 hover:bg-white/10 hover:border-[#007BE5]/50 transition-all"
-          >
-            <FileText className="w-4 h-4 text-[#007BE5]" />
-            View Product Requirements Document
-          </Link>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+            <Link
+              href="/prd"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full text-sm text-gray-300 hover:bg-white/10 hover:border-[#007BE5]/50 transition-all"
+            >
+              <FileText className="w-4 h-4 text-[#007BE5]" />
+              Product Requirements (PRD)
+            </Link>
+            <Link
+              href="/trd"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full text-sm text-gray-300 hover:bg-white/10 hover:border-green-500/50 transition-all"
+            >
+              <Code className="w-4 h-4 text-green-400" />
+              Technical Requirements (TRD)
+            </Link>
+          </div>
         </div>
 
         {/* Demo Cards */}
